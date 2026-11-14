@@ -71,13 +71,10 @@ Es krim cup:10000</textarea>
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="config.js"></script>
 <script>
-// ====== ISI DUA BARIS INI DARI SUPABASE (Project Settings > API) ======
-const SUPABASE_URL=const SUPABASE_URL="https://uvfvuxbwvlfixtsggunx.supabase.co";
-const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV2ZnZ1eGJ3dmxmaXh0c2dndW54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ2MzU2NzAsImV4cCI6MjExMDIxMTY3MH0.SavJHnA7PkQvLyRylKhJQrWF5IEtQo6dcCUcXD77It8";
-const SUPABASE_KEY="";   // pakai "anon public" key, JANGAN service_role
-const EMAIL_DOMAIN="keliling.com"; // hanya untuk membentuk email internal dari nomor HP
-// =====================================================================
+window.addEventListener("error",e=>{const a=document.getElementById("am");if(a)a.textContent="Kesalahan program: "+e.message});
+// Konfigurasi ada di file config.js (SUPABASE_URL, SUPABASE_KEY, EMAIL_DOMAIN)
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const rp=n=>'Rp'+Math.round(n).toLocaleString('id-ID');
@@ -190,7 +187,8 @@ async function submit(){
 }
 
 document.addEventListener('click',async e=>{
-  const t=e.target.closest('button');if(!t||!sb)return;
+  const t=e.target.closest('button');if(!t)return;
+  if(!sb){am('Belum terhubung ke Supabase. Periksa config.js.');return}
   if(t.id==='ta'||t.id==='tr'){regMode=t.id==='tr';$('#ta').classList.toggle('on',!regMode);$('#tr').classList.toggle('on',regMode);$('#reg').hidden=!regMode;$('#ago').textContent=regMode?'Daftar':'Masuk';am('')}
   else if(t.id==='ago')submit();
   else if(t.id==='out'){await sb.auth.signOut();location.reload()}
@@ -216,7 +214,8 @@ $('#sim').addEventListener('change',()=>{draw();if(on)pub()});
 
 (async()=>{
   if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
-  if(!sb){am('Aplikasi belum dikonfigurasi: isi SUPABASE_URL dan SUPABASE_KEY di index.html.');return}
+  if(typeof SUPABASE_URL==='undefined'||!SUPABASE_URL||!SUPABASE_KEY){am('Aplikasi belum dikonfigurasi: isi SUPABASE_URL dan SUPABASE_KEY di config.js.');return}
+  if(!sb){am('Pustaka Supabase gagal dimuat. Periksa koneksi internet lalu muat ulang.');return}
   const s=await sb.auth.getSession();
   if(s.data.session)enter(s.data.session.user);
 })();
