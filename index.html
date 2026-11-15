@@ -3,36 +3,52 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#C2410C">
+<meta name="theme-color" content="#15803D">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
 <title>Keliling</title>
 <style>
-:root{--bg:#fff;--fg:#1B1F2A;--mu:#4A5160;--ln:#DADFE7;--ac:#C2410C;--on:#fff;--tl:#0B5F5A;--tb:#E6F4F1;--mp:#EEF1F5;--cd:#fff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root{--bg:#fff;--fg:#1B1F2A;--mu:#4A5160;--ln:#DADFE7;--ac:#C2410C;--on:#fff;--tl:#0B5F5A;--tb:#E6F4F1;--mp:#EEF1F5;--cd:#fff;--gr:#15803D;box-sizing:border-box}
 @media(prefers-color-scheme:dark){:root{--bg:#14171F;--fg:#F1F3F7;--mu:#B4BBC9;--ln:#2B303C;--ac:#FB923C;--on:#14171F;--tl:#7EDBD2;--tb:#12302D;--mp:#1E2430;--cd:#1B2029}}
-body{margin:0 auto;max-width:480px;padding:16px;background:var(--bg);color:var(--fg);font-family:Inter,system-ui,sans-serif;line-height:1.4}
-h1{margin:0;font-size:26px}h2{font-size:17px;margin:20px 0 8px}
+html,body{margin:0;background:var(--bg)}
+body{color:var(--fg);font-family:Inter,system-ui,sans-serif;line-height:1.4}
+#authWrap{max-width:480px;margin:0 auto;padding:calc(16px + env(safe-area-inset-top,0px)) 16px 16px}
+h1{margin:0;font-size:26px}h2{font-size:16px;margin:16px 0 8px}
 .m{color:var(--mu);font-size:13px;margin:4px 0}
 label{display:block;font-size:14px;font-weight:600;margin-top:10px}
 input,select,textarea{display:block;width:100%;box-sizing:border-box;min-height:46px;margin:4px 0;padding:10px 12px;border:1px solid var(--ln);border-radius:10px;background:var(--cd);color:var(--fg);font:inherit}
 input[type=radio]{display:inline-block;width:20px;min-height:20px;margin:0 6px 0 0}
 button{min-height:46px;padding:0 14px;border:0;border-radius:12px;background:var(--ac);color:var(--on);font:inherit;font-weight:600;cursor:pointer}
-button.o{background:transparent;color:var(--ac);border:1.5px solid var(--ac)}
+button.o,a.o{background:transparent;color:var(--ac);border:1.5px solid var(--ac)}
 button:disabled{opacity:.45;cursor:default}
 .seg{display:flex;gap:8px;margin:12px 0}.seg button{flex:1;background:var(--mp);color:var(--fg)}.seg button.on{background:var(--ac);color:var(--on)}
 .c{border:1px solid var(--ln);border-radius:14px;padding:12px;margin-bottom:10px;background:var(--cd)}
-.r{display:flex;gap:8px;align-items:center;justify-content:space-between}.r>button{flex:1}
+.r{display:flex;gap:8px;align-items:center;justify-content:space-between}.r>button,.r>a{flex:1}
 .t{display:inline-block;font-size:12px;font-weight:600;padding:3px 8px;border-radius:99px;background:var(--tb);color:var(--tl)}
 .w{background:var(--mp);border-radius:10px;padding:8px 10px;font-size:13px;margin:8px 0}
-svg{display:block;width:100%;height:auto;background:var(--mp);border-radius:14px;margin-top:10px}
+.bt{display:flex;align-items:center;justify-content:center;min-height:46px;padding:0 14px;border-radius:12px;background:var(--ac);color:var(--on);font-weight:600;text-decoration:none;text-align:center;box-sizing:border-box}
+.vi{width:44px;height:44px;border-radius:50%;background:var(--mp);display:flex;align-items:center;justify-content:center;font-size:24px;flex:none}
+.gb{background:var(--gr);color:#fff;border-radius:16px;padding:12px 14px;font-weight:700;margin-bottom:10px;font-size:16px}
+.gb small{display:block;font-weight:500;opacity:.95;font-size:13px}
 [hidden]{display:none!important}
+#app{display:flex;flex-direction:column;height:100vh;height:100dvh;position:relative;overflow:hidden}
+#top{position:absolute;top:calc(10px + env(safe-area-inset-top,0px));left:10px;right:10px;z-index:1000;display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--cd);border-radius:14px;padding:6px 6px 6px 14px;box-shadow:0 2px 10px rgba(0,0,0,.2)}
+#top button{min-height:36px}
+#mapw{position:relative;flex:1;min-height:180px}
+#map{position:absolute;inset:0;background:var(--mp);z-index:0}
+#loc{position:absolute;right:12px;bottom:28px;z-index:500;width:46px;padding:0;border-radius:50%;background:var(--cd);color:var(--fg);box-shadow:0 2px 8px rgba(0,0,0,.3);font-size:20px}
+#sheet{flex:none;max-height:56vh;overflow:auto;background:var(--bg);border-radius:22px 22px 0 0;margin-top:-18px;position:relative;z-index:600;box-shadow:0 -4px 16px rgba(0,0,0,.2);padding:10px 16px calc(16px + env(safe-area-inset-bottom,0px))}
+#grip{width:40px;height:4px;border-radius:2px;background:var(--ln);margin:0 auto 10px}
+.pin{width:40px;height:40px;border-radius:50%;background:#fff;border:3px solid #15803D;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 2px 8px rgba(0,0,0,.35)}
+.me{width:18px;height:18px;border-radius:50%;background:#2563EB;border:3px solid #fff;box-shadow:0 0 0 7px rgba(37,99,235,.25)}
+summary{font-weight:700;font-size:15px;padding:6px 0;cursor:pointer}
 </style>
 </head>
 <body>
+<div id="authWrap">
 <h1>Keliling</h1>
-<p class="m" id="st"></p>
-
 <section id="auth">
 <div class="seg"><button id="ta" class="on">Masuk</button><button id="tr">Daftar</button></div>
 <div id="reg" hidden>
@@ -44,96 +60,142 @@ svg{display:block;width:100%;height:auto;background:var(--mp);border-radius:14px
 <button id="ago" style="width:100%;margin-top:12px">Masuk</button>
 <p class="m" id="am"></p>
 </section>
+</div>
 
 <main id="app" hidden>
-<div class="r"><b id="who"></b><button class="o" id="out" style="flex:0;min-height:36px">Keluar</button></div>
-<svg id="radar" viewBox="0 0 300 260" role="img" aria-label="Radar posisi"></svg>
-<p class="m" id="loc">Mencari lokasi GPS…</p>
+<div id="top"><b id="who"></b><button class="o" id="out">Keluar</button></div>
+<div id="mapw"><div id="map" role="region" aria-label="Peta"></div><button id="loc" aria-label="Ke lokasiku">&#9678;</button></div>
+<div id="sheet">
+<div id="grip"></div>
+<div id="banner" class="gb" hidden></div>
+<p class="m" id="st"></p>
 
 <section id="buyer">
-<div id="sheet"></div>
+<div id="sheetorder"></div>
 <h2>Pedagang di sekitar</h2><div id="bl"></div>
 <h2>Pesanan saya</h2><div id="bo"></div>
 </section>
 
 <section id="seller">
+<div id="vact"></div>
+<details id="cfg" open><summary>Pengaturan dagangan</summary>
 <label for="sn">Nama usaha</label><input id="sn">
-<label for="sk">Jenis dagangan</label><input id="sk" placeholder="Es krim">
-<label for="sm">Menu (satu per baris, nama:harga)</label><textarea id="sm" rows="3">Es krim cone:8000
-Es krim cup:10000</textarea>
+<label for="sk">Jenis dagangan</label><input id="sk" placeholder="Bakso">
+<label for="si">Ikon di peta</label>
+<select id="si"><option value="🛵">🛵 Motor</option><option value="🛒">🛒 Gerobak</option><option value="🍜">🍜 Bakso / mie</option><option value="🍦">🍦 Es krim</option><option value="🍢">🍢 Sate</option><option value="🥤">🥤 Minuman</option><option value="🥬">🥬 Sayur</option><option value="🍞">🍞 Roti</option></select>
+<label for="sm">Menu (satu per baris, nama:harga)</label><textarea id="sm" rows="3">Bakso:10000
+Es teh:3000</textarea>
 <label for="sr">Jarak jangkauan antar</label>
 <select id="sr"><option value="0.5">500 m</option><option value="1">1 km</option><option value="2" selected>2 km</option><option value="3">3 km</option></select>
 <div id="simbox" hidden><label for="sim">Simulasi jarak (hanya mode uji)</label>
 <select id="sim"><option value="0">Posisi asli</option><option value="250">Geser 250 m</option><option value="700">Geser 700 m</option><option value="1500">Geser 1,5 km</option></select></div>
-<button id="go" style="width:100%;margin-top:12px">Mulai keliling</button>
+</details>
+<button id="go" style="width:100%;margin:10px 0">Mulai keliling</button>
 <h2>Pesanan masuk</h2><div id="so"></div>
 </section>
+</div>
 </main>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
 window.addEventListener("error",e=>{const a=document.getElementById("am");if(a)a.textContent="Kesalahan program: "+e.message});
-// Konfigurasi ada di file config.js (SUPABASE_URL, SUPABASE_KEY, EMAIL_DOMAIN)
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const rp=n=>'Rp'+Math.round(n).toLocaleString('id-ID');
 const fmt=d=>d<1000?Math.round(d)+' m':(d/1000).toFixed(1).replace('.',',')+' km';
 const M=111320,uji=/uji=1/.test(location.search);
-const sb=(SUPABASE_URL&&window.supabase)?supabase.createClient(SUPABASE_URL,SUPABASE_KEY):null;
-let prof=null,uid=null,me={lat:3.5952,lng:98.6722},watching=false,V=[],O=[],sel=null,mode='antar',cart={},on=false,hasV=false,timer=null,regMode=false;
+const sb=(typeof SUPABASE_URL!=='undefined'&&SUPABASE_URL&&window.supabase)?supabase.createClient(SUPABASE_URL,SUPABASE_KEY):null;
+let prof=null,uid=null,me={lat:3.5952,lng:98.6722},acc=0,watching=false,V=[],O=[],sel=null,mode='antar',cart={},on=false,hasV=false,timer=null,regMode=false;
+let map=null,layer=null,lastFit='',RC={k:'',t:0,coords:null},inflight=false,rebuilt=false;
 
 function dist(a,b){const t=Math.PI/180,x=(b.lng-a.lng)*t*Math.cos((a.lat+b.lat)/2*t),y=(b.lat-a.lat)*t;return Math.hypot(x,y)*6371000}
 function rule(d){if(d<=300)return{min:0,fee:0};if(d<=1000)return{min:15000,fee:0};if(d<=2000)return{min:30000,fee:3000};return null}
 function pos(){return prof&&prof.role==='vendor'?{lat:me.lat+(uji?+$('#sim').value:0)/M,lng:me.lng}:me}
 const msg=t=>{$('#st').textContent=t||''};
 const am=t=>{$('#am').textContent=t||''};
+const nav=(lat,lng)=>'https://www.google.com/maps/dir/?api=1&destination='+(+lat).toFixed(6)+','+(+lng).toFixed(6);
+const eta=(rt,k)=>RC.k===k&&RC.s?Math.max(1,Math.round(RC.s/60)):Math.max(1,Math.round(dist(rt.from,rt.to)/250));
+const rkey=rt=>[rt.from.lat,rt.from.lng,rt.to.lat,rt.to.lng].map(n=>(+n).toFixed(3)).join(',');
 
 function track(){
   if(watching)return;
-  if(!navigator.geolocation){$('#loc').textContent='GPS tidak tersedia, memakai lokasi contoh (Medan).';return}
+  if(!navigator.geolocation){return}
   watching=true;
-  navigator.geolocation.watchPosition(p=>{me={lat:p.coords.latitude,lng:p.coords.longitude};$('#loc').textContent='GPS aktif · akurasi ±'+Math.round(p.coords.accuracy)+' m';draw()},
-  ()=>{$('#loc').textContent='GPS ditolak atau gagal. Izinkan lokasi di pengaturan browser.';draw()},{enableHighAccuracy:true,maximumAge:5000});
+  navigator.geolocation.watchPosition(p=>{me={lat:p.coords.latitude,lng:p.coords.longitude};acc=p.coords.accuracy;draw()},
+  ()=>{msg('GPS ditolak atau gagal. Izinkan lokasi di pengaturan browser.')},{enableHighAccuracy:true,maximumAge:5000});
 }
 
-function radar(pts){
-  const c=pos(),mx=Math.max(500,...pts.map(p=>p.d)),s=105/mx;
-  let h='<circle cx="150" cy="130" r="105" fill="none" stroke="var(--ln)"/><circle cx="150" cy="130" r="52" fill="none" stroke="var(--ln)"/><text x="154" y="22" font-size="10" fill="var(--mu)">'+fmt(mx)+'</text>';
-  pts.forEach(p=>{const x=150+(p.lng-c.lng)*Math.cos(c.lat*Math.PI/180)*M*s,y=130-(p.lat-c.lat)*M*s;
-    h+='<circle cx="'+x+'" cy="'+y+'" r="8" fill="'+p.c+'"/><text x="'+(x+11)+'" y="'+(y+4)+'" font-size="11" fill="var(--fg)">'+esc(p.l.slice(0,14))+'</text>'});
-  h+='<circle cx="150" cy="130" r="7" fill="#2563EB" stroke="#fff" stroke-width="2"/><text x="160" y="146" font-size="11" fill="var(--fg)">Kamu</text>';
-  $('#radar').innerHTML=h;
+function initMap(){
+  if(map||!window.L)return;
+  map=L.map('map',{zoomControl:false}).setView([me.lat,me.lng],15);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap'}).addTo(map);
+  layer=L.layerGroup().addTo(map);
+  if(window.ResizeObserver)new ResizeObserver(()=>map.invalidateSize()).observe($('#mapw'));
+  setTimeout(()=>map.invalidateSize(),300);
+}
+const pin=(e,c)=>L.divIcon({className:'',html:'<div class="pin" style="border-color:'+c+'">'+esc(e)+'</div>',iconSize:[40,40],iconAnchor:[20,20]});
+async function getRoute(rt,k){
+  if(inflight)return;inflight=true;
+  try{
+    const r=await fetch('https://router.project-osrm.org/route/v1/driving/'+rt.from.lng+','+rt.from.lat+';'+rt.to.lng+','+rt.to.lat+'?overview=full&geometries=geojson');
+    const j=await r.json(),x=j.routes&&j.routes[0];
+    RC=x?{k,t:Date.now(),coords:x.geometry.coordinates.map(a=>[a[1],a[0]]),d:x.distance,s:x.duration}:{k,t:Date.now(),coords:null};
+  }catch(e){RC={k,t:Date.now(),coords:null}}
+  inflight=false;draw();
+}
+function drawMap(items,rt){
+  initMap();if(!map)return;
+  layer.clearLayers();
+  const c=pos(),ll=[[c.lat,c.lng]];
+  if(rt){const k=rkey(rt);if(RC.k!==k||Date.now()-RC.t>30000)getRoute(rt,k);
+    if(RC.k===k&&RC.coords){L.polyline(RC.coords,{color:'#fff',weight:10,opacity:.95}).addTo(layer);L.polyline(RC.coords,{color:'#16A34A',weight:6}).addTo(layer)}
+    else L.polyline([[rt.from.lat,rt.from.lng],[rt.to.lat,rt.to.lng]],{color:'#16A34A',weight:5,dashArray:'8 8'}).addTo(layer)}
+  L.marker([c.lat,c.lng],{icon:L.divIcon({className:'',html:'<div class="me"></div>',iconSize:[18,18],iconAnchor:[9,9]}),keyboard:false}).addTo(layer);
+  items.forEach(p=>{ll.push([p.lat,p.lng]);const m=L.marker([p.lat,p.lng],{icon:pin(p.icon,p.color),title:p.l}).addTo(layer);if(p.click)m.on('click',p.click)});
+  const key=items.map(p=>p.lat.toFixed(3)+p.lng.toFixed(3)).join('|')+(rt?'r':'');
+  if(key!==lastFit){lastFit=key;map.fitBounds(ll,{paddingTopLeft:[40,90],paddingBottomRight:[40,80],maxZoom:17})}
 }
 
 function draw(){
   if(!prof)return;
   const c=pos();
+  if(acc>500)msg('Akurasi GPS rendah (±'+Math.round(acc)+' m). Di HP biasanya jauh lebih akurat.');
   if(prof.role==='buyer'){
-    const L=V.map(v=>({...v,d:dist(c,v)})).sort((a,b)=>a.d-b.d);
-    $('#bl').innerHTML=L.length?L.map(v=>{const inR=v.d<=v.radius_km*1000&&rule(v.d);return '<div class="c"><div class="r"><b>'+esc(v.name)+'</b><span class="t">'+fmt(v.d)+'</span></div><div class="m">'+esc(v.kind)+(inR?'':' · di luar jangkauan antar')+'</div><div class="r" style="margin-top:8px"><button data-v="'+esc(v.id)+'" data-m="antar"'+(inR?'':' disabled')+'>Pesan antar</button><button class="o" data-v="'+esc(v.id)+'" data-m="datang">Aku ke sana</button></div></div>'}).join(''):'<p class="m">Belum ada pedagang yang sedang keliling.</p>';
-    $('#bo').innerHTML=O.length?O.map(o=>{const v=V.find(x=>x.id===o.vendor_id),d=v?fmt(dist(c,v)):'-';
-      const s={baru:'Menunggu pedagang',diterima:o.mode==='antar'?'Pedagang menuju lokasimu · sisa '+d:'Pedagang menunggu di titiknya · jarak '+d,selesai:'Selesai',ditolak:'Ditolak pedagang',dibatalkan:'Dibatalkan'}[o.status]||o.status;
-      return '<div class="c"><div class="r"><b>'+esc(o.vendor_name)+'</b><span class="t">'+esc(o.status)+'</span></div><div class="m">'+esc(o.items.map(i=>i.q+'x '+i.n).join(', '))+' · '+rp(o.total)+'</div><div class="w">'+esc(s)+'</div>'+(o.status==='baru'?'<button class="o" data-o="'+esc(o.id)+'" data-s="dibatalkan" style="width:100%">Batalkan</button>':'')+'</div>'}).join(''):'<p class="m">Belum ada pesanan.</p>';
-    const act=O.find(o=>o.status==='diterima'),av=act&&V.find(x=>x.id===act.vendor_id);
-    radar(av?[{...av,c:'#C2410C',l:av.name,d:dist(c,av)}]:L.slice(0,6).map(v=>({...v,c:'#C2410C',l:v.name})));
+    const L2=V.map(v=>({...v,d:dist(c,v)})).sort((a,b)=>a.d-b.d);
+    const act=O.find(o=>o.status==='diterima'),pend=O.find(o=>o.status==='baru'),av=act&&V.find(x=>x.id===act.vendor_id);
+    const rt=act&&av?(act.mode==='antar'?{from:av,to:c}:{from:c,to:av}):null;
+    if(rt){const m=eta(rt,rkey(rt));$('#banner').hidden=false;$('#banner').innerHTML=act.mode==='antar'?'Pedagang akan sampai dalam '+m+' mnt<small>'+esc(av.icon||'🛵')+' '+esc(av.name)+' menuju lokasimu</small>':'Pesanan diterima<small>Menuju '+esc(av.name)+' · sekitar '+m+' mnt · '+fmt(dist(c,av))+'</small>'}
+    else if(pend){$('#banner').hidden=false;$('#banner').innerHTML='Menunggu pedagang menerima pesananmu<small>'+esc(pend.vendor_name)+'</small>'}
+    else $('#banner').hidden=true;
+    $('#bl').innerHTML=L2.length?L2.map(v=>{const inR=v.d<=v.radius_km*1000&&rule(v.d);return '<div class="c"><div class="r" style="justify-content:flex-start;gap:12px"><div class="vi">'+esc(v.icon||'🛵')+'</div><div style="flex:1"><b>'+esc(v.name)+'</b><div class="m">'+esc(v.kind)+' · '+fmt(v.d)+(inR?'':' · di luar jangkauan antar')+'</div></div></div><div class="r" style="margin-top:8px"><button data-v="'+esc(v.id)+'" data-m="antar"'+(inR?'':' disabled')+'>Pesan antar</button><button class="o" data-v="'+esc(v.id)+'" data-m="datang">Aku ke sana</button></div></div>'}).join(''):'<p class="m">Belum ada pedagang yang sedang keliling.</p>';
+    $('#bo').innerHTML=O.length?O.map(o=>{const v=V.find(x=>x.id===o.vendor_id);
+      const s={baru:'Menunggu pedagang',diterima:o.mode==='antar'?'Pedagang menuju lokasimu':'Pedagang menunggu di titiknya',selesai:'Selesai',ditolak:'Ditolak pedagang',dibatalkan:'Dibatalkan'}[o.status]||o.status;
+      return '<div class="c"><div class="r"><b>'+esc(o.vendor_name)+'</b><span class="t">'+esc(o.status)+'</span></div><div class="m">'+esc(o.items.map(i=>i.q+'x '+i.n).join(', '))+' · '+rp(o.total)+'</div><div class="w">'+esc(s)+'</div>'+(o.status==='diterima'&&o.mode==='datang'&&v?'<a class="bt" style="margin-bottom:8px" target="_blank" rel="noopener" href="'+nav(v.lat,v.lng)+'">Navigasi ke pedagang</a>':'')+(o.status==='baru'?'<button class="o" data-o="'+esc(o.id)+'" data-s="dibatalkan" style="width:100%">Batalkan</button>':'')+'</div>'}).join(''):'<p class="m">Belum ada pesanan.</p>';
+    drawMap(rt?[{lat:av.lat,lng:av.lng,icon:av.icon||'🛵',color:'#15803D',l:av.name}]:L2.slice(0,15).map(v=>({lat:v.lat,lng:v.lng,icon:v.icon||'🛵',color:'#15803D',l:v.name,click:()=>{sel=v.id;mode='antar';cart={};draw()}})),rt);
     sheet();
   }else{
+    const ac=O.find(o=>o.status==='diterima'&&o.mode==='antar');
+    const rt=ac?{from:c,to:{lat:ac.buyer_lat,lng:ac.buyer_lng}}:null;
+    if(rt){const m=eta(rt,rkey(rt));$('#banner').hidden=false;$('#banner').innerHTML='Menuju pembeli · '+m+' mnt<small>'+esc(ac.buyer_name)+' · '+fmt(dist(c,rt.to))+'</small>'}
+    else $('#banner').hidden=true;
     $('#so').innerHTML=O.length?O.map(o=>{const d=fmt(dist(c,{lat:o.buyer_lat,lng:o.buyer_lng}));
-      const b=o.status==='baru'?'<button data-o="'+esc(o.id)+'" data-s="diterima">Terima</button><button class="o" data-o="'+esc(o.id)+'" data-s="ditolak">Tolak</button>':o.status==='diterima'?'<button data-o="'+esc(o.id)+'" data-s="selesai">Tandai selesai</button>':'';
+      const b=o.status==='baru'?'<button data-o="'+esc(o.id)+'" data-s="diterima">Terima</button><button class="o" data-o="'+esc(o.id)+'" data-s="ditolak">Tolak</button>':o.status==='diterima'?(o.mode==='antar'?'<a class="bt" style="flex:1" target="_blank" rel="noopener" href="'+nav(o.buyer_lat,o.buyer_lng)+'">Navigasi ke pembeli</a>':'')+'<button data-o="'+esc(o.id)+'" data-s="selesai">Tandai selesai</button>':'';
       return '<div class="c"><div class="r"><b>'+esc(o.buyer_name)+'</b><span class="t">'+esc(o.status)+'</span></div><div class="m">'+(o.mode==='antar'?'Pesan antar':'Pembeli datang')+' · '+d+' · '+rp(o.total)+'</div><div class="m">'+esc(o.items.map(i=>i.q+'x '+i.n).join(', '))+'</div><div class="r" style="margin-top:8px">'+b+'</div></div>'}).join(''):'<p class="m">Belum ada pesanan masuk.</p>';
-    radar(O.filter(o=>o.status==='baru'||o.status==='diterima').map(o=>({lat:o.buyer_lat,lng:o.buyer_lng,c:'#2563EB',l:o.buyer_name,d:dist(c,{lat:o.buyer_lat,lng:o.buyer_lng})})));
+    drawMap(O.filter(o=>o.status==='baru'||o.status==='diterima').map(o=>({lat:o.buyer_lat,lng:o.buyer_lng,icon:'🏠',color:'#2563EB',l:o.buyer_name})),rt);
   }
 }
 
 function sheet(){
   const v=V.find(x=>x.id===sel);
-  if(!v){$('#sheet').innerHTML='';return}
+  if(!v){$('#sheetorder').innerHTML='';return}
   const d=dist(me,v),r=mode==='antar'?rule(d):{min:0,fee:0},sub=v.items.reduce((s,i,k)=>s+i.p*(cart[k]||0),0);
   const ok=r&&sub>0&&sub>=r.min&&(mode==='datang'||d<=v.radius_km*1000);
-  $('#sheet').innerHTML='<div class="c"><div class="r"><b>'+esc(v.name)+'</b><button class="o" id="x" style="flex:0;min-height:36px">Tutup</button></div><div class="m">'+(mode==='antar'?'Pedagang datang ke lokasimu · '+fmt(d):'Kamu datang ke pedagang · '+fmt(d)+(d>1000?' (cukup jauh)':''))+'</div>'+
+  $('#sheetorder').innerHTML='<div class="c"><div class="r"><div class="r" style="justify-content:flex-start;gap:10px"><div class="vi">'+esc(v.icon||'🛵')+'</div><b>'+esc(v.name)+'</b></div><button class="o" id="x" style="flex:0;min-height:36px">Tutup</button></div><div class="m">'+(mode==='antar'?'Pedagang datang ke lokasimu · '+fmt(d):'Kamu datang ke pedagang · '+fmt(d)+(d>1000?' (cukup jauh)':''))+'</div>'+
   v.items.map((i,k)=>'<div class="r" style="margin:6px 0"><span>'+esc(i.n)+' <span class="m">'+rp(i.p)+'</span></span><span class="r"><button class="o" data-q="'+k+'" data-d="-1" style="min-height:40px">-</button><b>'+(cart[k]||0)+'</b><button class="o" data-q="'+k+'" data-d="1" style="min-height:40px">+</button></span></div>').join('')+
   (r&&r.min?'<div class="w">Jarak '+fmt(d)+': minimal order '+rp(r.min)+(r.fee?' + ongkos '+rp(r.fee):'')+'</div>':'')+
+  (mode==='datang'?'<a class="bt o" style="margin:8px 0" target="_blank" rel="noopener" href="'+nav(v.lat,v.lng)+'">Lihat rute ke pedagang</a>':'')+
   '<div class="r"><span>Total</span><b>'+rp(sub+(sub&&r?r.fee:0))+'</b></div><button id="ord" style="width:100%;margin-top:8px"'+(ok?'':' disabled')+'>Pesan sekarang</button><div class="m">Bayar di tempat: tunai atau QRIS pedagang.</div></div>';
 }
 
@@ -148,26 +210,28 @@ async function refresh(){
 async function pub(){
   const items=$('#sm').value.split('\n').map(l=>{const i=l.lastIndexOf(':');return{n:l.slice(0,i).trim().slice(0,40),p:Math.round(+l.slice(i+1))}}).filter(i=>i.n&&i.p>0);
   const c=pos();
-  const row={name:$('#sn').value.trim()||prof.name,kind:$('#sk').value.trim()||'Dagangan',items,radius_km:+$('#sr').value,is_on:on,lat:c.lat,lng:c.lng};
-  const r=hasV?await sb.from('vendors').update(row).eq('id',uid):await sb.from('vendors').insert({id:uid,...row});
+  const row={name:$('#sn').value.trim()||prof.name,kind:$('#sk').value.trim()||'Dagangan',items,radius_km:+$('#sr').value,is_on:on,lat:c.lat,lng:c.lng,icon:$('#si').value};
+  const send=x=>hasV?sb.from('vendors').update(x).eq('id',uid):sb.from('vendors').insert({id:uid,...x});
+  let r=await send(row);
+  if(r.error&&/icon/i.test(r.error.message)){const x={...row};delete x.icon;r=await send(x);if(!r.error)msg('Ikon belum aktif: jalankan patch-icon.sql di Supabase agar ikon bisa dipilih.')}
   if(r.error){msg('Gagal menyimpan: '+r.error.message);return false}
-  hasV=true;msg('');return true;
+  hasV=true;return true;
 }
 
 async function enter(user){
   uid=user.id;
   const r=await sb.from('profiles').select('*').eq('id',uid).maybeSingle();
   if(r.error||!r.data){am('Profil tidak ditemukan. Pastikan schema.sql sudah dijalankan.');return}
-  prof=r.data;$('#auth').hidden=true;$('#app').hidden=false;
+  prof=r.data;$('#authWrap').hidden=true;$('#app').hidden=false;
   $('#who').textContent=prof.name+' · '+(prof.role==='vendor'?'Pedagang':'Pembeli');
   $('#buyer').hidden=prof.role!=='buyer';$('#seller').hidden=prof.role!=='vendor';
   $('#simbox').hidden=!uji;
   if(prof.role==='vendor'){
     const v=await sb.from('vendors').select('*').eq('id',uid).maybeSingle();
-    if(v.data){hasV=true;$('#sn').value=v.data.name;$('#sk').value=v.data.kind;$('#sm').value=v.data.items.map(i=>i.n+':'+i.p).join('\n');$('#sr').value=String(+v.data.radius_km)}
+    if(v.data){hasV=true;$('#sn').value=v.data.name;$('#sk').value=v.data.kind;$('#sm').value=v.data.items.map(i=>i.n+':'+i.p).join('\n');$('#sr').value=String(+v.data.radius_km);if(v.data.icon)$('#si').value=v.data.icon}
     else $('#sn').value=prof.name;
   }
-  track();await refresh();
+  initMap();track();await refresh();draw();
   sb.channel('keliling').on('postgres_changes',{event:'*',schema:'public',table:'vendors'},refresh).on('postgres_changes',{event:'*',schema:'public',table:'orders'},refresh).subscribe();
   setInterval(refresh,8000);
 }
@@ -182,7 +246,7 @@ async function submit(){
     r=await sb.auth.signUp({email,password:pin,options:{data:{name,phone,role}}});
   }else r=await sb.auth.signInWithPassword({email,password:pin});
   if(r.error)return am(r.error.message==='Invalid login credentials'?'Nomor HP atau PIN salah.':r.error.message);
-  if(!r.data.session)return am('Akun dibuat tetapi belum aktif. Matikan "Confirm email" di Supabase (Authentication > Providers > Email).');
+  if(!r.data.session)return am('Akun dibuat tetapi belum aktif. Matikan "Confirm email" di Supabase (Authentication > Sign In / Providers > Email).');
   enter(r.data.user);
 }
 
@@ -192,12 +256,14 @@ document.addEventListener('click',async e=>{
   if(t.id==='ta'||t.id==='tr'){regMode=t.id==='tr';$('#ta').classList.toggle('on',!regMode);$('#tr').classList.toggle('on',regMode);$('#reg').hidden=!regMode;$('#ago').textContent=regMode?'Daftar':'Masuk';am('')}
   else if(t.id==='ago')submit();
   else if(t.id==='out'){await sb.auth.signOut();location.reload()}
+  else if(t.id==='loc'){if(map){const c=pos();map.setView([c.lat,c.lng],16)}}
   else if(t.id==='go'){
     on=!on;t.textContent=on?'Berhenti keliling':'Mulai keliling';clearInterval(timer);
     const ok=await pub();if(!ok){on=false;t.textContent='Mulai keliling';return}
-    if(on)timer=setInterval(pub,15000);
+    msg(on?'Kamu sedang keliling. Pembeli bisa melihatmu di peta.':'');
+    if(on){$('#cfg').open=false;timer=setInterval(pub,15000)}
   }
-  else if(t.dataset.v){sel=t.dataset.v;mode=t.dataset.m;cart={};draw()}
+  else if(t.dataset.v){sel=t.dataset.v;mode=t.dataset.m;cart={};draw();$('#sheet').scrollTop=0}
   else if(t.id==='x'){sel=null;draw()}
   else if(t.dataset.q){const k=t.dataset.q;cart[k]=Math.max(0,(cart[k]||0)+ +t.dataset.d);sheet()}
   else if(t.id==='ord'){
